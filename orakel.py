@@ -32,6 +32,7 @@ def save(name, description):
  """
 def check_id(id):
     file = open(filename_request, encoding="utf-8").read().split("\n")
+    file = [f for f in file if f]
     ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
     names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
     descriptions = file[1::2]
@@ -44,6 +45,7 @@ def check_id(id):
 
 def find_id(id):
     file = open(filename_request, encoding="utf-8").read().split("\n")
+    file = [f for f in file if f]
     ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
     names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
     descriptions = file[1::2]
