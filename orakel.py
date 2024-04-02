@@ -10,6 +10,7 @@ def evalute(name):
     name = " ".join([n for n in name.split() if len(n) > 0]) # remove spaces
 
     file = open(filename_orakel, "r", encoding="utf-8").read().split("\n") # open file and split at linebreaks
+    file = [f for f in file if f]
     names = [n[2:].lower() for n in file[::2] if n[0:2] == "# "] # list of all names
     descriptions = file[1::2] # list of all descriptions
     try:
