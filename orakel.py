@@ -55,7 +55,8 @@ def find_id(id):
         index = ids.index(str(id))
     except ValueError:
         return 0, 0
-    except IndexError:
+    except IndexError as e:
+        print(e)
         return 0, 0
 
     return names[index], descriptions[index]
