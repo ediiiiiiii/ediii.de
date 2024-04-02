@@ -43,16 +43,19 @@ def check_id(id):
         return False
 
 def find_id(id):
-    file = open(filename_request, encoding="utf-8").read().split("\n")
-    ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
-    print(ids)
-    names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
-    print(names)
-    descriptions = file[1::2]
-
     try:
+        file = open(filename_request, encoding="utf-8").read().split("\n")
+        ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
+        print(ids)
+        names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
+        print(names)
+        descriptions = file[1::2]
+
+    
         index = ids.index(str(id))
     except ValueError:
+        return 0, 0
+    except IndexError:
         return 0, 0
 
     return names[index], descriptions[index]
