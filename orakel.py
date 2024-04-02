@@ -1,9 +1,10 @@
 from email_client import send_mail
 import random
 import string
+import sys
 
-filename_orakel = "orakel.geheim"
-filename_request = "request.orakel"
+filename_orakel = sys.path[0] + "/orakel.geheim"
+filename_request = sys.path[0] + "/request.orakel"
 
 def evalute(name):
     name = " ".join([n for n in name.split() if len(n) > 0]) # remove spaces
