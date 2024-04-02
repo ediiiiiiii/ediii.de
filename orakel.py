@@ -9,7 +9,7 @@ filename_request = sys.path[0] + "/request.orakel"
 def evalute(name):
     name = " ".join([n for n in name.split() if len(n) > 0]) # remove spaces
 
-    file = open(filename_orakel, "r").read().split("\n") # open file and split at linebreaks
+    file = open(filename_orakel, "r", encoding="utf-8").read().split("\n") # open file and split at linebreaks
     names = [n[2:].lower() for n in file[::2] if n[0:2] == "# "] # list of all names
     descriptions = file[1::2] # list of all descriptions
     try:
@@ -18,7 +18,7 @@ def evalute(name):
         return not_found(name)
 
 def save(name, description):
-    file = open(filename_orakel, "a")
+    file = open(filename_orakel, "a", encoding="utf-8")
     file.write(f"\n# {name}\n")
     file.write(description)
     file.close()
@@ -31,7 +31,7 @@ def save(name, description):
             if ()
  """
 def check_id(id):
-    file = open(filename_request).read().split("\n")
+    file = open(filename_request, encoding="utf-8").read().split("\n")
     ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
     names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
     descriptions = file[1::2]
@@ -43,7 +43,7 @@ def check_id(id):
         return False
 
 def find_id(id):
-    file = open(filename_request).read().split("\n")
+    file = open(filename_request, encoding="utf-8").read().split("\n")
     ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
     print(ids)
     names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
@@ -58,7 +58,7 @@ def find_id(id):
     return names[index], descriptions[index]
     
 def add_request(name, description):
-    file = open(filename_request, "a")
+    file = open(filename_request, "a", encoding="utf-8")
     id = str(random.randint(0, 10000000000000000000000))
     file.write(f"\n# {id} {name}\n")
     file.write(description)
