@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block css %}
+
+<link href="{{ url_for('static', filename='bunt.css')}}" rel="stylesheet">
+<link rel="apple-touch-icon" sizes="180x180" href="{{url_for('static', filename='icons/apple-touch-icon.png')}}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{url_for('static', filename='icons/favicon-32x32.png')}}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{url_for('static', filename='icons/favicon-16x16.png')}}">
+
+<meta name='description' content='Missgeschicke, Backen und Crepes machen sind wichtige Dinge im Leben.'>
+{% endblock %}
+{% block title %}Ediii's Webseite{% endblock %}
+
+{% block content %}
+<p class="fancy" align="center">Dies ist meine Webseite yaaaay :)</p>
+
+<font size="100">
+    <h1 align="center" style="margin-bottom: 0;" class="fancy">Hallo Welt!</h1>
+</font>
+<div class="container">
+    <center><img src="{{ url_for('static', filename='images/crepes_gehen_schief.jpg') }}
+        " alt="Crepes machen geht schief" class="img-fluid center"
+            style="border: 10px solid #ffffff; max-height: 500pt;" align="center"></center>
+</div>
+
+{% endblock %}

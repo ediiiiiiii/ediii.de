@@ -1,0 +1,16 @@
+html {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+footer {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+footer p {
+    text-align: center;
+}
+
+p,ul {
+    text-align: justify;
+}
