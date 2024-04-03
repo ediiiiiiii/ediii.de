@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import json
 import random
-from orakel import evalute, request_orakel, find_id, save, check_id
+import orakel
 app = Flask(__name__)
 
 @app.route("/")
@@ -17,11 +17,11 @@ def bunt():
     return render_template('bunt.html')
 
 @app.route("/orakel/", methods=['GET', 'POST'])
-def orakel():
+def orakel_page():
     if request.method == 'POST':
         name = request.json["question"]
         print(name)
-        return json.dumps({"response":evalute(name)})
+        return json.dumps({"response":orakel.evalute(name)})
     elif request.method == 'GET':
         return render_template('orakel.html')
 
@@ -31,16 +31,16 @@ def orakel_anfrage():
         name = request.form.get("name")
         description = request.form.get("description")
         url = "/".join(request.base_url.split("/")[:-2])
-        request_orakel(name, description, url=url)
+        orakel.request_orakel(name, description, url=url)
         return "Hallo"
     elif request.method == 'GET':
         return render_template('orakel_request.html')
 
 @app.route("/accept/<int:id>", methods=['GET'])
 def accept(id):
-    print(id)
-    name, desc = find_id(id)
-    if (name != 0 and desc != 0):
+    result = orakel.find_id(id)
+    if result:
+        name, desc = result
         return render_template('accept.html', id=id, name=name, desc=desc)
     else:
         return render_template('not_found.html')
@@ -52,10 +52,10 @@ def accept_invalid():
 @app.route("/accept/", methods=['POST'])
 def accept_post():
     id = request.form.get("id")
-    if (check_id(id)):
+    if (orakel.check_request(id)):
         name = request.form.get("name")
         desc = request.form.get("desc")
-        save(name, desc)
+        orakel.add_user(id, name, desc)
         return "yay"
     else:
         return 404

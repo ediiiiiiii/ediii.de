@@ -1,12 +1,10 @@
 from email_client import send_mail
 import random
 import string
-import sys
-
-filename_orakel = sys.path[0] + "/orakel.geheim"
-filename_request = sys.path[0] + "/request.orakel"
+import db
 
 def evalute(name):
+<<<<<<< HEAD
     name = " ".join([n for n in name.split() if len(n) > 0]) # remove spaces
 
     file = open(filename_orakel, "r", encoding="utf-8").read().split("\n") # open file and split at linebreaks
@@ -16,54 +14,30 @@ def evalute(name):
     try:
         return name + " " + descriptions[names.index(name.lower())]
     except ValueError:
+=======
+    desc = db.get_user_name(name)
+    if desc:
+        return name + " " + desc
+    else:
+>>>>>>> 8d80472 (Now using sqlite3 for data storage)
         return not_found(name)
 
-def save(name, description):
-    file = open(filename_orakel, "a", encoding="utf-8")
-    file.write(f"\n# {name}\n")
-    file.write(description)
-    file.close()
+def add_user(id, name, desc):
+    db.add_user(id, name, desc)
 
-""" def delete_index(index):
-    with open(filename_request, "r") as f:
-        lines = f.readlines()
-    with open(filename_request, "w") as f:
-        for l in (len(lines)):
-            if ()
- """
-def check_id(id):
-    file = open(filename_request, encoding="utf-8").read().split("\n")
-    file = [f for f in file if f]
-    ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
-    names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
-    descriptions = file[1::2]
-
-    try:
-        index = ids.index(str(id))
+def check_request(id):
+    if db.get_request(id):
         return True
-    except ValueError:
-        return False
+    return False
+
 
 def find_id(id):
-    file = open(filename_request, encoding="utf-8").read().split("\n")
-    file = [f for f in file if f]
-    ids = [f.split(" ")[1] for f in file[::2] if f[0] == "#"]
-    names = [" ".join(f.split(" ")[2:]) for f in file[::2] if f[0] == "#"]
-    descriptions = file[1::2]
-    try:
-        index = ids.index(str(id))
-    except ValueError:
-        return 0, 0
-
-
-    return names[index], descriptions[index]
+    return db.get_request(id)
     
 def add_request(name, description):
-    file = open(filename_request, "a", encoding="utf-8")
-    id = str(random.randint(0, 10000000000000000000000))
-    file.write(f"\n# {id} {name}\n")
-    file.write(description)
-    file.close()
+    id = str(random.randint(0, 10000000000))
+    print(id, name, description)
+    db.add_request(id, name, description)
     return id
 
 def request_orakel(name, description, url="127.0.0.1:5000"):
