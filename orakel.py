@@ -4,22 +4,10 @@ import string
 import db
 
 def evalute(name):
-<<<<<<< HEAD
-    name = " ".join([n for n in name.split() if len(n) > 0]) # remove spaces
-
-    file = open(filename_orakel, "r", encoding="utf-8").read().split("\n") # open file and split at linebreaks
-    file = [f for f in file if f]
-    names = [n[2:].lower() for n in file[::2] if n[0:2] == "# "] # list of all names
-    descriptions = file[1::2] # list of all descriptions
-    try:
-        return name + " " + descriptions[names.index(name.lower())]
-    except ValueError:
-=======
     desc = db.get_user_name(name)
     if desc:
         return name + " " + desc
     else:
->>>>>>> 8d80472 (Now using sqlite3 for data storage)
         return not_found(name)
 
 def add_user(id, name, desc):
