@@ -23,7 +23,7 @@
         const consoleElement = document.getElementById('type-in');
         const cursorElement = document.getElementById('cursor');
 
-        function typeWriter(text, ondone = function() {}, index = 0, base = null) {
+        function typeWriter(text, ondone = function () { }, index = 0, base = null) {
             console.log(text, index, base, ondone);
             if (base == null) base = consoleElement.innerHTML;
             if (index <= text.length) {
@@ -31,7 +31,7 @@
                 cursorElement.classList.remove('blink');
                 consoleElement.innerHTML = base + text.substring(0, index);
                 index++;
-                
+
                 setTimeout(function () { typeWriter(text, ondone, index, base); }, 100)
             } else {
                 window.scrollTo(0, document.body.scrollHeight);
@@ -53,26 +53,31 @@
 
         function addInput(maxCharacters = 20) {
             inputField = document.createElement("input");
-            
+
             inputField.setAttribute("maxlength", maxCharacters);
 
             identifier = Date.now().toString()
             inputElement = identifier;
             inputField.setAttribute("class", "console-input");
             inputField.setAttribute("id", identifier);
-            inputField.setAttribute("oninput", "adjustWidth(" + identifier + ")");
+            inputField.setAttribute("oninput", "moveCursor()");
+            inputField.setAttribute("onkeydown", "moveCursor()");
+            inputField.setAttribute("onkeyup", "moveCursor()");
+            inputField.setAttribute("onclick", "moveCursor()");
             inputField.setAttribute("autofocus", true);
             consoleElement.appendChild(inputField);
-            setTimeout(function() {inputField.focus()}, 10);
+            setTimeout(function () { inputField.focus() }, 10);
+            cursorElement.style.position = "absolute";
+            moveCursor(); 
 
             inputField.addEventListener('blur', function (event) { // ChatGPT
                 if (inputField.id === inputElement) {
                     event.preventDefault();
-                    setTimeout(function() {inputField.focus()}, 10);
+                    setTimeout(function () { inputField.focus() }, 10);
                 }
             });
 
-            inputField.addEventListener('keydown', function(event) {
+            inputField.addEventListener('keydown', function (event) {
                 if (inputField.id === inputElement && event.key == "Enter") {
                     console.log("Enter")
                     inputElement = null;
@@ -81,18 +86,19 @@
                     inputField.remove()
                     consoleElement.innerHTML += inputText + "\n" // Input Element durch Text austauschen
                     getResponse(inputText); // POST request machen
+                    cursorElement.style.position = "static";
                 }
             });
 
-            
+
         }
 
         async function getResponse(name) {
-            data = {'question': name}
+            data = { 'question': name }
             response = await fetch(window.location.href, {
                 method: "POST",
                 headers: {
-                    "Content-Type" : "application/json"
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify(data),
             })
@@ -102,62 +108,74 @@
 
         function ask() {
             console.log("Ask")
-            typeWriter("Gebe dazu den Namen der Person ein:\n> ", function() {addInput()});
-            
+            typeWriter("Gebe dazu den Namen der Person ein:\n> ", function () { addInput() });
+
         }
 
         function handleResponse(data) {
             typeWriter("Denke...");
-            setTimeout(function() {removeText(3);}, 2000)
-            setTimeout(function() {typeWriter("...")}, 2800)
-            setTimeout(function() {removeText(3);}, 3600)
-            setTimeout(function() {typeWriter("...")}, 4400)
-            setTimeout(function() {removeText(8);}, 5200)
-            setTimeout(function() {
+            setTimeout(function () { removeText(3); }, 2000)
+            setTimeout(function () { typeWriter("...") }, 2800)
+            setTimeout(function () { removeText(3); }, 3600)
+            setTimeout(function () { typeWriter("...") }, 4400)
+            setTimeout(function () { removeText(8); }, 5200)
+            setTimeout(function () {
                 msg = data.response;
-    
-                typeWriter("Antwort: " + msg + "\n\n", function() {
-                    typeWriter("Du kannst nochmal fragen. ", function() {ask()});                    
-                });         
+
+                typeWriter("Antwort: " + msg + "\n\n", function () {
+                    typeWriter("Du kannst nochmal fragen. ", function () { ask() });
+                });
             }, 6000);
 
         }
 
-        function adjustWidth(inputClass) { // von ChatGPT
-            let input = document.getElementById(inputClass);
-            let tempSpan = document.createElement('span');
-            tempSpan.style.visibility = 'hidden'; // Versteckt den Span, damit er nicht sichtbar ist
-            tempSpan.style.position = 'absolute'; // Verhindert, dass der Span den Fluss des Dokuments beeinflusst
-            tempSpan.style.whiteSpace = 'pre'; // Behält Leerzeichen und Zeilenumbrüche bei
+        function getCharacterWidth(character, input) { // Copilot
+            var test = document.createElement("span");
+            test.style.visibility = "hidden";
+            test.style.whiteSpace = "pre";
+            test.style.font = window.getComputedStyle(input).font; // Kopieren Sie die Schriftart des Eingabefelds
 
-            // Übernimmt Schriftart, Größe usw. vom Input
-            tempSpan.style.font = window.getComputedStyle(input).font;
+            test.textContent = character;
 
-            // Setzt den Text des Span auf den Input-Wert
-            tempSpan.textContent = input.value.replace(/\s/g, "\u00a0"); // Ersetzt Leerzeichen durch Non-Breaking Spaces
+            document.body.appendChild(test);
 
-            document.body.appendChild(tempSpan);
+            // Breite messen
+            var width = test.getBoundingClientRect().width;
 
-            // Setzt die Breite des Input-Feldes auf die des Span + ein kleiner Puffer
-            input.style.width = (tempSpan.offsetWidth) + 'px'; // +10 für etwas zusätzlichen Raum
+            document.body.removeChild(test);
 
-            document.body.removeChild(tempSpan);
-
-
-            // Setzt die Animation des Cursors zurück, sodass er nicht mehr blinkt
-            cursorElement.classList.remove('blink');
-            void cursorElement.offsetWidth
-            cursorElement.classList.add('blink');
+            return width;
         }
 
-        setTimeout(function () { cursorElement.classList.add('blink'); cursorElement.style.opacity = 1 }, 3000)         
-        setTimeout(function() {typeWriter("Ich bin das Orakel deiner Wahl.");}, 4000);
+        var lastPos = 0;
+        function moveCursor() { // Copilot (modified)
+            var input = document.getElementById(inputElement);
+            var cursor = document.getElementById('cursor');
+            var pos = input.selectionStart;
+            var rect = input.getBoundingClientRect();
+            var x = rect.left + window.pageXOffset;
+            var y = rect.top + window.pageYOffset;
+            cursor.style.left = (x + pos * getCharacterWidth("a", input)) + 'px';
+            cursor.style.top = y + 'px';
+            if (lastPos == pos) {
+                cursorElement.classList.add('blink');
+            } else {
+                cursorElement.classList.remove('blink');
+            }
+            lastPos = pos;
+            
+        }
+
+
+
+         setTimeout(function () { cursorElement.classList.add('blink'); cursorElement.style.opacity = 1 }, 3000)         
+ /*       setTimeout(function() {typeWriter("Ich bin das Orakel deiner Wahl.");}, 4000);
         setTimeout(function() {typeWriter(" Willkommen!");}, 8000);
         setTimeout(function() {typeWriter("\n\nWünsche kann ich dir zwar nicht erfüllen, aber");}, 10500);
         setTimeout(function() {typeWriter(" ich kann dir sagen, welche Personen auf dieser Welt cool sind.")}, 17000);
         setTimeout(function() {typeWriter("\nAlso scheu dich nicht und frage nach.\n\n")}, 24000);
-        setTimeout(function() {ask();}, 28500);
-        
+ */        setTimeout(function () { ask(); }, 285);
+
 
     </script>
 </body>
