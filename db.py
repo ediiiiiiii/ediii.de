@@ -1,6 +1,7 @@
 import sqlite3 as sql
+import sys
 
-path = "orakel.db"
+path = sys.path[0] + "/orakel.db"
 
 
 def add_request(id, name, desc):
@@ -37,6 +38,7 @@ def add_user(id, name, desc):
         conn.commit()
 
 def reset_db():
+    print(path)
     with sql.connect(path) as conn:
         db = conn.cursor()
         try:
