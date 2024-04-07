@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="{{ url_for('static', filename='orakel/orakel.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <title>Das magischste Orakel</title>
 </head>
 
@@ -24,7 +25,6 @@
         const cursorElement = document.getElementById('cursor');
 
         function typeWriter(text, ondone = function () { }, index = 0, base = null) {
-            console.log(text, index, base, ondone);
             if (base == null) base = consoleElement.innerHTML;
             if (index <= text.length) {
                 // █
@@ -51,7 +51,44 @@
             }
         }
 
-        function addInput(maxCharacters = 20) {
+
+        function addInput() {
+            containerElem = document.createElement("div");
+            containerElem.setAttribute("class", "input-container");
+            containerElem.setAttribute("id", "input-div")
+            containerElem.innerHTML = `<input class="console-input" id="input" oninput="moveCursor()" onkeydown="moveCursor()" onkeyup="moveCursor()" onclick="moveCursor()" maxlength=20 autofocus></input><button type="button" class="btn" id="input-btn"><i class="bi-arrow-right-square"></i></button>`;
+            consoleElement.appendChild(containerElem);
+            cursorElement.style.position = "absolute"; // Attach Cursor
+            moveCursor(); // Move Cursor to input field
+
+
+            inputField = document.getElementById("input");
+            inputBtn = document.getElementById("input-btn");
+            inputContainer = document.getElementById("input-div");
+            
+            setTimeout(function () { inputField.focus() }, 10);
+
+            inputField.addEventListener('keydown', function (event) {
+                if (event.key == "Enter") {
+                    event.preventDefault();
+                    search();
+                }
+            })
+            inputBtn.addEventListener('click', search);
+
+            function search() {
+                console.log("Search");
+                cursorElement.style.position = "static"; // Detach Cursor
+                inputText = inputField.value;
+                inputContainer.remove();
+                consoleElement.innerHTML += inputText + "\n"; // Textfeld ersetzen
+
+                getResponse(inputText);
+            }
+        }
+
+/*         function addInput(maxCharacters = 20) {
+            var btn = "<button type='button' class='btn'><i class='bi-arrow-right-square'></i></button>"
             inputField = document.createElement("input");
 
             inputField.setAttribute("maxlength", maxCharacters);
@@ -91,7 +128,7 @@
             });
 
 
-        }
+        } */
 
         async function getResponse(name) {
             data = { 'question': name }
@@ -149,7 +186,7 @@
 
         var lastPos = 0;
         function moveCursor() { // Copilot (modified)
-            var input = document.getElementById(inputElement);
+            var input = document.getElementById("input");
             var cursor = document.getElementById('cursor');
             var pos = input.selectionStart;
             var rect = input.getBoundingClientRect();
