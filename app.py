@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request
 import json
 import time
-import random
+
 import orakel
+import scoreboard as sb
 
 app = Flask(__name__)
 
@@ -71,3 +72,12 @@ def accept_post():
 def request_sent():
     return render_template('sent.html')
 
+@app.route("/scoreboard/", methods=["POST"])
+def spiel():
+    data = request.json
+    print(data)
+    username = data.get("username")
+    score = data.get("score")
+    if username != None and score != None:
+        return json.dumps(sb.set_score(username, score))
+    return json.dumps(sb.get_scores())
