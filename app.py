@@ -1,8 +1,12 @@
 from flask import Flask, render_template, request
 import json
+import time
 import random
 import orakel
+
 app = Flask(__name__)
+
+countdown = 3124227661000
 
 @app.route("/")
 def startseite():
@@ -23,7 +27,10 @@ def orakel_page():
         print(name)
         return json.dumps({"response":orakel.evalute(name)})
     elif request.method == 'GET':
-        return render_template('orakel.html')
+        if (countdown - time.time()*1000) < 0:
+            return render_template('orakel.html')
+        else: 
+            return render_template('countdown.html', countdown=countdown)
 
 @app.route("/request-coolness/", methods=['GET', 'POST'])
 def orakel_anfrage():

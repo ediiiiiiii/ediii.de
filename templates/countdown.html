@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="{{ url_for('static', filename='orakel/countdown.css') }}" rel="stylesheet">
+
+    <title>Orakel</title>
+</head>
+
+<body>
+    <span class="countdown" id="countdown"></span>
+    <script>
+        let countdown = document.getElementById("countdown");
+        let date = new Date();
+        let ziel = {{countdown}};
+
+        function pad(n) {
+            return ('0'+n).slice(-2);
+        }
+
+        function update() {
+
+            diff = ziel - (new Date());
+            sekunden = Math.floor(diff/1000);
+            minuten = Math.floor(sekunden/60);
+            stunden = Math.floor(minuten/60);
+
+            if (diff > 20000000) {
+                countdown.innerHTML = "Coming soon..."
+            } else if (diff < 0) {
+                countdown.innerHTML = "00:00:00"
+                if (diff < -1500) {
+                    location.reload();
+                }
+            } else {
+                countdown.innerHTML = `${pad(stunden)}:${pad(minuten % 60)}:${pad(sekunden % 60)}`
+            }
+            
+            setTimeout(update, 100);
+            
+        }
+        update();
+    </script>
+</body>
+</html>
